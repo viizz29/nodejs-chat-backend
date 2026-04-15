@@ -11,10 +11,14 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { ChatModule } from './chat/chat.module';
+import { RoomsModule } from './rooms/rooms.module';
+import { RoomMembersModule } from './room_members/room_members.module';
 
 const imports = [
   AuthModule,
   UsersModule,
+  RoomsModule,
+  RoomMembersModule,
   SequelizeModule.forRoot({
     dialect: 'postgres', // or 'mysql', 'sqlite', etc.
     host: 'localhost',

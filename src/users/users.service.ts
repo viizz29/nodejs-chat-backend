@@ -16,7 +16,7 @@ export class UsersService {
 
   // This runs automatically when the module starts
   async onModuleInit() {
-    await this.seedTestUser();
+    // await this.seedTestUser();
   }
 
   private async seedTestUser() {

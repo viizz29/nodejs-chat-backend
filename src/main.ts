@@ -1,8 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
-import { API_BASE_URL, DOCS_BASE_URL, PORT } from './config';
+import { API_BASE_URL, DOCS_URL, PORT } from './config';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { EncodeIdInterceptor } from './common/encode-id.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -28,16 +29,27 @@ async function bootstrap() {
     .setTitle('NestJS Sequelize API')
     .setDescription('The API description for my awesome project')
     .setVersion('1.0')
-    .addBearerAuth() // Adds the "Authorize" button for JWT
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'Authorization',
+        description: 'Enter JWT token',
+        in: 'header',
+      },
+      'access-token', // 👈 name (used later)
+    ) // Adds the "Authorize" button for JWT
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
 
   // Setup the UI at the /api endpoint
-  SwaggerModule.setup(DOCS_BASE_URL, app, document);
+  SwaggerModule.setup(DOCS_URL, app, document);
 
   // Enable CORS for all origins
   app.enableCors();
+  app.useGlobalInterceptors(new EncodeIdInterceptor());
   await app.listen(PORT);
 }
 

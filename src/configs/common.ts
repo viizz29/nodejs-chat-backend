@@ -24,13 +24,13 @@ export const PUBLIC_HOST_WITH_PORT = process.env.PUBLIC_HOST_WITH_PORT
 
 export const DB_DATABASE = process.env.DB_DATABASE
   ? process.env.DB_DATABASE
-  : 'hie-deployer-dev';
+  : 'db72387238';
 export const DB_USERNAME = process.env.DB_USERNAME
   ? process.env.DB_USERNAME
   : 'postgres';
 export const DB_PASSWORD = process.env.DB_PASSWORD
   ? process.env.DB_PASSWORD
-  : 'NewPassword';
+  : 'password';
 export const DB_HOST = process.env.DB_HOST ? process.env.DB_HOST : '127.0.0.1';
 export const DATABASE_URL = `postgresql://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:5432/${DB_DATABASE}?schema=public&connection_limit=2`;
 
@@ -44,3 +44,5 @@ export const LOCAL_STORAGE_LOCATION = process.env.LOCAL_STORAGE_LOCATION
 export const TEMP_LOCATION = process.env.TEMP_LOCATION
   ? process.env.TEMP_LOCATION
   : `${LOCAL_STORAGE_LOCATION}/temp`;
+
+export const DOCS_URL = process.env.DOCS_URL ? process.env.DOCS_URL : `/docs`;
