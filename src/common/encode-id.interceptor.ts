@@ -6,8 +6,9 @@ import {
 } from '@nestjs/common';
 import { map } from 'rxjs/operators';
 import Hashids from 'hashids';
+import { HASHID_SALT } from 'src/config';
 
-const hashids = new Hashids('your-salt', 10);
+const hashids = new Hashids(HASHID_SALT, 10);
 function encodeId(id: number) {
   return hashids.encode(id);
 }

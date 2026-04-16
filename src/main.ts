@@ -49,6 +49,13 @@ async function bootstrap() {
 
   // Enable CORS for all origins
   app.enableCors();
+
+  // app.enableCors({
+  //   origin: true, // or your frontend URL
+  //   credentials: true,
+  //   allowedHeaders: ['Content-Type', 'Authorization'],
+  // });
+
   app.useGlobalInterceptors(new EncodeIdInterceptor());
   await app.listen(PORT);
 }

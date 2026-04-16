@@ -46,3 +46,6 @@ export const TEMP_LOCATION = process.env.TEMP_LOCATION
   : `${LOCAL_STORAGE_LOCATION}/temp`;
 
 export const DOCS_URL = process.env.DOCS_URL ? process.env.DOCS_URL : `/docs`;
+export const HASHID_SALT = process.env.HASHID_SALT
+  ? process.env.HASHID_SALT
+  : `your-salt`;

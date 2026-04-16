@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Sequelize } from 'sequelize';
 import { RoomMember } from './room_member.model';
 
 @Injectable()
@@ -14,30 +13,13 @@ export class RoomMemberRepository {
     return this.roomMemberModel.findAll({
       attributes: [
         'user_id',
-        'sn',
-        'type',
-        'title',
+        'room_sn',
+        'member_id',
+        'is_approved',
+        'is_blocked',
         'created_at',
         'updated_at',
       ],
-    });
-  }
-
-  async findByUserId(user_id: number): Promise<RoomMember[]> {
-    return this.roomMemberModel.findAll({
-      attributes: [
-        [
-          Sequelize.fn(
-            'json_build_array',
-            Sequelize.col('user_id'),
-            Sequelize.col('sn'),
-          ),
-          'id',
-        ],
-        'type',
-        'title',
-      ],
-      where: { user_id },
     });
   }
 }

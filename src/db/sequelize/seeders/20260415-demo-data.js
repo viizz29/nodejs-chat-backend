@@ -94,12 +94,32 @@ module.exports = {
       // Step 3: Create 5 messages per user
 
       const messages = [
-        { from: 0, to: 1, content: { type: 'text', content: 'Hi' } },
-        { from: 1, to: 0, content: { type: 'text', content: 'Hello' } },
-        { from: 0, to: 1, content: { type: 'text', content: 'How are you?' } },
-        { from: 1, to: 0, content: { type: 'text', content: 'I am fine.' } },
-        { from: 0, to: 1, content: { type: 'text', content: 'What about u?' } },
-        { from: 1, to: 0, content: { type: 'text', content: 'All good.' } },
+        { from: 0, to: 1, content: { type: 'text', content: { text: 'Hi' } } },
+        {
+          from: 1,
+          to: 0,
+          content: { type: 'text', content: { text: 'Hello' } },
+        },
+        {
+          from: 0,
+          to: 1,
+          content: { type: 'text', content: { text: 'How are you?' } },
+        },
+        {
+          from: 1,
+          to: 0,
+          content: { type: 'text', content: { text: 'I am fine.' } },
+        },
+        {
+          from: 0,
+          to: 1,
+          content: { type: 'text', content: { text: 'What about u?' } },
+        },
+        {
+          from: 1,
+          to: 0,
+          content: { type: 'text', content: { text: 'All good.' } },
+        },
       ];
 
       const messageRecords = [];
