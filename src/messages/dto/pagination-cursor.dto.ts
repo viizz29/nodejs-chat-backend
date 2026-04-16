@@ -12,24 +12,28 @@ export class PaginationCursorDto {
     description: 'HashId (encoded)',
     default: '',
   })
-  @Transform(({ value }) => {
-    console.log('Incoming:', value);
+  // @Transform(({ value }) => {
+  //   console.log('Incoming:', value);
 
-    const decoded = hashids.decode(value);
+  //   const decoded = hashids.decode(value);
 
-    console.log('Decoded:', decoded);
+  //   console.log('Decoded:', decoded);
 
-    return decoded.length ? decoded : undefined;
-  })
+  //   return decoded.length ? decoded : undefined;
+  // })
   @IsArray()
   @IsInt({ each: true })
   handleId: number[] = [];
 
+  @ApiProperty({
+    type: String,
+    description: 'HashId (encoded)',
+    default: '',
+  })
   @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  @Min(1)
-  cursor: number | null = null;
+  @IsArray()
+  @IsInt({ each: true })
+  cursorId: number[] = [];
 
   @IsOptional()
   @Type(() => Number)

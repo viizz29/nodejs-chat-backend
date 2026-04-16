@@ -30,16 +30,18 @@ export class MessagesController {
   @ApiBearerAuth('access-token')
   @Get()
   findAll(@Query() query: PaginationCursorDto, @CurrentUser() user: JwtUser) {
-    const { handleId } = query;
-    console.log({ handleId });
+    const { handleId, cursorId } = query;
+    // console.log({ handleId });
+    const cursor: number | null = cursorId ? cursorId[1] : null;
 
     if (handleId.length == 1) {
       // memberId
       const memberId = handleId[0];
+
       return this.messageService.findExchangedMessages(
         user.userId,
         memberId,
-        query.cursor,
+        cursor,
         query.limit,
       );
     } else {
@@ -48,7 +50,7 @@ export class MessagesController {
       return this.messageService.findAllPaginated2(
         user.userId,
         roomSn,
-        query.cursor,
+        cursor,
         query.limit,
       );
     }

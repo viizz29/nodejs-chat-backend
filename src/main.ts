@@ -4,6 +4,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { API_BASE_URL, DOCS_URL, PORT } from './config';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { EncodeIdInterceptor } from './common/encode-id.interceptor';
+import { DecodeIdPipe } from './common/decode-id.pipe';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -17,6 +18,7 @@ async function bootstrap() {
 
   // This triggers the class-validator logic
   app.useGlobalPipes(
+    new DecodeIdPipe(),
     new ValidationPipe({
       whitelist: true, // Strips away properties that don't have decorators in the DTO
       forbidNonWhitelisted: true, // Throws an error if extra properties are sent

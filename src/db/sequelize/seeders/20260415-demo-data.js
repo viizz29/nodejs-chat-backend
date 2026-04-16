@@ -120,7 +120,33 @@ module.exports = {
           to: 0,
           content: { type: 'text', content: { text: 'All good.' } },
         },
+        {
+          from: 0,
+          to: 1,
+          content: { type: 'text', content: { text: 'I need a help?' } },
+        },
+        {
+          from: 1,
+          to: 0,
+          content: { type: 'text', content: { text: 'Regarding what?' } },
+        },
       ];
+
+      for (let k = 1; k <= 1000; k++) {
+        if (k % 2 == 1) {
+          messages.push({
+            from: 0,
+            to: 1,
+            content: { type: 'text', content: { text: `${k}` } },
+          });
+        } else {
+          messages.push({
+            from: 1,
+            to: 0,
+            content: { type: 'text', content: { text: `${k}` } },
+          });
+        }
+      }
 
       const messageRecords = [];
 

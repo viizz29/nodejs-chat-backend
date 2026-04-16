@@ -40,9 +40,11 @@ export class MessagesService {
       limit,
     );
 
+    console.log(messages[0]);
+
     return {
       data: messages,
-      prevCursor: messages.length > 0 ? messages[messages.length - 1].id : null,
+      prev_cursor_id: messages.length > 0 ? messages[0].id : [0],
     };
   }
 }

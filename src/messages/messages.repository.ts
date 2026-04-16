@@ -103,8 +103,9 @@ export class MessageRepository {
       where,
       limit,
       order: [['sn', 'DESC']],
+      raw: true,
     });
 
-    return rows;
+    return rows.reverse();
   }
 }
