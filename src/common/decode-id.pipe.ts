@@ -24,7 +24,7 @@ function decodeValue(value: any): any {
   const decoded = hashids.decode(value);
 
   if (decoded.length) {
-    return decoded;
+    return decoded.length == 1 ? decoded[0] : decoded;
   }
 
   return value; // keep original if not decodable
@@ -63,12 +63,20 @@ function transformDeep(data: any): any {
 export class DecodeIdPipe implements PipeTransform {
   transform(value: any, metadata: ArgumentMetadata) {
     // Only process incoming request data
+    // console.log({ metadata, value });
     if (
       metadata.type === 'query' ||
-      metadata.type === 'body' ||
-      metadata.type === 'param'
+      metadata.type === 'body'
+      // || metadata.type === 'param'
     ) {
       return transformDeep(value);
+    } else if (metadata.type == 'param') {
+      const newValue = isIdField(metadata.data as string)
+        ? decodeValue(value)
+        : value;
+
+      // console.log({ newValue });
+      return newValue;
     }
 
     // console.log({ value });

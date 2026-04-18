@@ -24,72 +24,25 @@ module.exports = {
         { type: Sequelize.QueryTypes.SELECT, transaction },
       );
 
-      // create the user_metadata records
-      const userMetadataRecords = [];
-      insertedUsers.forEach((user) => {
-        userMetadataRecords.push({
-          user_id: user.id,
-          created_at: now,
-          updated_at: now,
-        });
-      });
-      await queryInterface.bulkInsert('user_metadata', userMetadataRecords, {
-        transaction,
+      // create the room for user1 and user2
+
+      const rooms323 = [];
+      rooms323.push({
+        first_member_id: insertedUsers[0].id,
+        second_member_id: insertedUsers[1].id,
+        created_at: now,
+        updated_at: now,
       });
 
-      // create the 'self' room corresponding to each user
+      await queryInterface.bulkInsert('rooms', rooms323, { transaction });
 
-      const selfRooms = [];
-      for (const user of insertedUsers) {
-        selfRooms.push({
-          user_id: user.id,
-          sn: 1n,
-          type: 'self',
-          created_at: now,
-          updated_at: now,
-        });
-      }
-
-      await queryInterface.bulkInsert('rooms', selfRooms, { transaction });
-
-      const groups = [];
-      for (const user of insertedUsers) {
-        for (let i = 0; i < 2; i++) {
-          groups.push({
-            user_id: user.id,
-            sn: 1n,
-            type: 'group',
-            title: `Group${i + 1}`,
-            created_at: now,
-            updated_at: now,
-          });
-        }
-      }
-      await queryInterface.bulkInsert('rooms', groups, { transaction });
-
-      // connect user1 and user2 with each other
-      await queryInterface.bulkInsert(
-        'room_members',
-        [
-          {
-            user_id: insertedUsers[0].id,
-            room_sn: 1,
-            member_id: insertedUsers[1].id,
-            is_approved: true,
-            created_at: now,
-            updated_at: now,
-          },
-          {
-            user_id: insertedUsers[1].id,
-            room_sn: 1,
-            member_id: insertedUsers[0].id,
-            is_approved: true,
-            created_at: now,
-            updated_at: now,
-          },
-        ],
-        { transaction },
+      // Step 2: Fetch inserted users (to get IDs)
+      const insertedRooms = await queryInterface.sequelize.query(
+        `SELECT id FROM "rooms";`,
+        { type: Sequelize.QueryTypes.SELECT, transaction },
       );
+
+      const theRoom = insertedRooms[0];
 
       // Step 3: Create 5 messages per user
 
@@ -153,22 +106,9 @@ module.exports = {
       messages.forEach((msg) => {
         const { from, to, content } = msg;
         messageRecords.push({
-          user_id: insertedUsers[from].id,
-          sn: 1,
-          room_sn: 1,
-          second_party: insertedUsers[to].id,
-          direction: 'out',
-          content: JSON.stringify(content),
-          created_at: now,
-          updated_at: now,
-        });
-
-        messageRecords.push({
-          user_id: insertedUsers[to].id,
-          sn: 1,
-          room_sn: 1,
-          second_party: insertedUsers[from].id,
-          direction: 'in',
+          from_user_id: insertedUsers[from].id,
+          room_id: theRoom.id,
+          to_user_id: insertedUsers[to].id,
           content: JSON.stringify(content),
           created_at: now,
           updated_at: now,
@@ -186,13 +126,9 @@ module.exports = {
     await queryInterface.sequelize.transaction(async (transaction) => {
       // Delete all messages first (due to FK constraint)
       await queryInterface.bulkDelete('messages', null, {});
-
-      await queryInterface.bulkDelete('room_members', null, {});
-
       await queryInterface.bulkDelete('rooms', null, {});
-
       // Then delete users
-      await queryInterface.bulkDelete('Users', null, {});
+      await queryInterface.bulkDelete('users', null, {});
     });
   },
 };

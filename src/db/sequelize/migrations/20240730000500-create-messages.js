@@ -5,11 +5,28 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.sequelize.transaction(async (transaction) => {
-      // 1. Create room_members table
+      // 1. Create messages table
       await queryInterface.createTable(
-        'room_members',
+        'messages',
         {
-          user_id: {
+          id: {
+            allowNull: false,
+            autoIncrement: true,
+            primaryKey: true,
+            type: Sequelize.BIGINT,
+          },
+          room_id: {
+            type: Sequelize.BIGINT,
+            allowNull: false,
+            references: {
+              model: 'rooms',
+              key: 'id',
+            },
+            onUpdate: 'CASCADE',
+            onDelete: 'CASCADE',
+          },
+
+          from_user_id: {
             type: Sequelize.BIGINT,
             allowNull: false,
             references: {
@@ -20,11 +37,7 @@ module.exports = {
             onDelete: 'CASCADE',
           },
 
-          room_sn: {
-            type: Sequelize.BIGINT,
-            allowNull: false,
-          },
-          member_id: {
+          to_user_id: {
             type: Sequelize.BIGINT,
             allowNull: false,
             references: {
@@ -34,15 +47,10 @@ module.exports = {
             onUpdate: 'CASCADE',
             onDelete: 'CASCADE',
           },
-          is_approved: {
-            type: Sequelize.BOOLEAN,
+
+          content: {
+            type: Sequelize.JSON,
             allowNull: false,
-            defaultValue: false,
-          },
-          is_blocked: {
-            type: Sequelize.BOOLEAN,
-            allowNull: false,
-            defaultValue: false,
           },
 
           created_at: {
@@ -57,34 +65,13 @@ module.exports = {
         },
         { transaction },
       );
-
-      await queryInterface.addConstraint('room_members', {
-        type: 'primary key',
-        fields: ['user_id', 'room_sn', 'member_id'],
-        name: 'pk_room_members',
-        transaction,
-      });
-
-      // 2. Add composite foreign key: (user_id, room_sn) ? journal_entries(user_id, sn)
-      await queryInterface.addConstraint('room_members', {
-        fields: ['user_id', 'room_sn'],
-        type: 'foreign key',
-        name: 'fk_room_of_room_members',
-        references: {
-          table: 'rooms',
-          fields: ['user_id', 'sn'],
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
-        transaction,
-      });
     });
   },
 
   async down(queryInterface, Sequelize) {
     await queryInterface.sequelize.transaction(async (transaction) => {
       // Drop the table (this automatically removes constraints)
-      await queryInterface.dropTable('room_members', { transaction });
+      await queryInterface.dropTable('messages', { transaction });
     });
   },
 };

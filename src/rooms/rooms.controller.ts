@@ -4,7 +4,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { CurrentUser, type JwtUser } from 'src/common/current-user.decorator';
 
-@Controller('rooms')
+@Controller('v1/rooms')
 export class RoomsController {
   constructor(private roomsService: RoomsService) {}
 

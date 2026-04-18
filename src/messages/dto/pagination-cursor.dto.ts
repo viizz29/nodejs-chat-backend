@@ -21,9 +21,11 @@ export class PaginationCursorDto {
 
   //   return decoded.length ? decoded : undefined;
   // })
-  @IsArray()
-  @IsInt({ each: true })
-  handleId: number[] = [];
+  // @IsArray()
+  // @IsInt({ each: true })
+  // roomId: number[] = [];
+  @IsInt()
+  roomId: number = 0;
 
   @ApiProperty({
     type: String,
@@ -31,9 +33,8 @@ export class PaginationCursorDto {
     default: '',
   })
   @IsOptional()
-  @IsArray()
-  @IsInt({ each: true })
-  cursorId: number[] = [];
+  @IsInt()
+  cursorId: number = 0;
 
   @IsOptional()
   @Type(() => Number)

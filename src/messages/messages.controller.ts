@@ -1,9 +1,16 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { MessagesService } from './messages.service';
 import { CurrentUser, type JwtUser } from 'src/common/current-user.decorator';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth } from '@nestjs/swagger';
-import { PaginationDto } from 'src/messages/dto/pagination.dto';
 import { PaginationCursorDto } from './dto/pagination-cursor.dto';
 
 @Controller('v1/messages')
@@ -30,29 +37,35 @@ export class MessagesController {
   @ApiBearerAuth('access-token')
   @Get()
   findAll(@Query() query: PaginationCursorDto, @CurrentUser() user: JwtUser) {
-    const { handleId, cursorId } = query;
-    // console.log({ handleId });
-    const cursor: number | null = cursorId ? cursorId[1] : null;
+    const { roomId, cursorId } = query;
+    // console.log({ cursorId });
 
-    if (handleId.length == 1) {
-      // memberId
-      const memberId = handleId[0];
+    return this.messageService.findExchangedMessages(
+      user.userId,
+      roomId,
+      cursorId,
+      query.limit,
+    );
+  }
 
-      return this.messageService.findExchangedMessages(
-        user.userId,
-        memberId,
-        cursor,
-        query.limit,
-      );
-    } else {
-      // userId, roomSn
-      const roomSn = handleId[1];
-      return this.messageService.findAllPaginated2(
-        user.userId,
-        roomSn,
-        cursor,
-        query.limit,
-      );
-    }
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth('access-token')
+  @Post(':handleId')
+  handleAction(
+    @Param('handleId') handleId: string,
+    @Body() body: { text: string },
+    @CurrentUser() user: JwtUser,
+  ) {
+    console.log({ handleId });
+
+    const hndleIdNum = Number(handleId);
+
+    const { text } = body;
+
+    return {
+      handleId,
+      text,
+      status: 'success',
+    };
   }
 }

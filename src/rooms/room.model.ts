@@ -1,30 +1,16 @@
-import {
-  Column,
-  Model,
-  Table,
-  DataType,
-  PrimaryKey,
-} from 'sequelize-typescript';
+import { Column, Model, Table } from 'sequelize-typescript';
 
 @Table({
   tableName: 'rooms',
   timestamps: true,
 })
 export class Room extends Model {
-  @PrimaryKey
   @Column
-  user_id!: number;
-
-  @PrimaryKey
-  @Column
-  sn!: number;
+  type!: '1to1' | 'group';
 
   @Column
-  type!: 'self' | 'group';
+  firstMemberId!: number;
 
-  @Column({
-    type: DataType.STRING,
-    allowNull: true,
-  })
-  title!: string;
+  @Column
+  secondMemberId!: number;
 }

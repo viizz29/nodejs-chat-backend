@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Message } from './message.model';
-import { Op } from 'sequelize';
+import { Op, Transaction } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
 
 @Injectable()
@@ -9,6 +9,7 @@ export class MessageRepository {
   constructor(
     @InjectModel(Message)
     private messageModel: typeof Message,
+    private readonly sequelize: Sequelize,
   ) {}
 
   async findAll(): Promise<Message[]> {
@@ -72,40 +73,94 @@ export class MessageRepository {
 
   async findExchangedMessages(
     userId: number,
-    memberId: number,
+    roomId: number,
     cursor: number | null,
     limit: number,
   ) {
-    let where: any = { user_id: userId, second_party: memberId };
+    let where: any = {
+      room_id: roomId,
+    };
+
+    console.log({ cursor });
 
     if (cursor) {
       where = {
         ...where,
-        sn: { [Op.lt]: cursor },
+        id: { [Op.lt]: cursor },
       };
     }
 
     const rows = await this.messageModel.findAll({
-      attributes: [
-        [
-          Sequelize.fn(
-            'json_build_array',
-            Sequelize.col('user_id'),
-            Sequelize.col('sn'),
-          ),
+      attributes: {
+        include: [
           'id',
+          // 'fromUserId',
+          // 'toUserId',
+          'content',
+          'createdAt',
+          'updatedAt',
+          [
+            Sequelize.literal(`
+        CASE 
+          WHEN "from_user_id" = :userId THEN 'out'
+          ELSE 'in'
+        END
+      `),
+            'direction',
+          ],
         ],
-        'direction',
-        'content',
-        'createdAt',
-        'updatedAt',
-      ],
+      },
       where,
       limit,
-      order: [['sn', 'DESC']],
+      order: [['id', 'DESC']],
       raw: true,
+      replacements: {
+        userId,
+      },
     });
 
     return rows.reverse();
+  }
+
+  async recordIndividualTextMessage(
+    userId: number,
+    secondPartyId: number,
+    text: string,
+  ) {
+    const content = {
+      type: 'text',
+      content: {
+        text,
+      },
+    };
+
+    // transaction
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const results = await this.sequelize.transaction(async (t: Transaction) => {
+      // find the 'self' room sn of the sending user
+      // const selfRoom1 = await this.messageModel.findOne({
+      //   attributes:[
+
+      //   ]
+      // })
+
+      const msg1 = await this.messageModel.create(
+        {
+          userId,
+          sn: 1,
+          roomSn: 1,
+          secondParty: secondPartyId,
+          direction: 'out',
+          content,
+        },
+        { transaction: t },
+      );
+
+      // find the 'self' room sn of the second party
+
+      return msg1;
+    });
+
+    return results;
   }
 }

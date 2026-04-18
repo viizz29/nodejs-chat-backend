@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ChatHandleRepository } from './messages.repository';
+import { ChatHandleRepository } from './chat-handles.repository';
 
 @Injectable()
 export class ChatHandlesService {

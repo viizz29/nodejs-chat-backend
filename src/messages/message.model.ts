@@ -1,32 +1,18 @@
-import {
-  Column,
-  Model,
-  Table,
-  PrimaryKey,
-  DataType,
-} from 'sequelize-typescript';
+import { Column, Model, Table, DataType } from 'sequelize-typescript';
 
 @Table({
   tableName: 'messages',
   timestamps: true,
 })
 export class Message extends Model {
-  @PrimaryKey
   @Column
-  userId!: number;
-
-  @PrimaryKey
-  @Column
-  sn!: number;
+  room_id!: number;
 
   @Column
-  roomSn!: number;
+  fromUserId!: number;
 
   @Column
-  secondParty!: number;
-
-  @Column
-  direction!: 'in' | 'out';
+  toUserId!: number;
 
   @Column({
     type: DataType.JSON,
