@@ -22,6 +22,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server!: Server;
 
+  private userSockets = new Map<string, Set<string>>();
+
   constructor(private jwtService: JwtService) {}
 
   async handleConnection(client: Socket) {
@@ -43,6 +45,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       // Attach user data to the client object for later use
       client.data.user = payload;
       console.log(`Client connected: ${client.id} (User: ${payload.sub})`);
+
+      const userId = payload.sub;
+
+      // if (!userId) return;
+
+      if (!this.userSockets.has(userId)) {
+        this.userSockets.set(userId, new Set());
+      }
+
+      this.userSockets.get(userId)?.add(client.id);
     } catch (e) {
       console.log(`Connection rejected: ${e.message}`);
       client.disconnect(); // Terminate connection if unauthorized
@@ -50,6 +62,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   handleDisconnect(client: Socket) {
+    for (const [userId, sockets] of this.userSockets.entries()) {
+      if (sockets.has(client.id)) {
+        sockets.delete(client.id);
+        if (sockets.size === 0) {
+          this.userSockets.delete(userId);
+        }
+        break;
+      }
+    }
     console.log(`Client disconnected: ${client.id}`);
   }
 
@@ -71,6 +92,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   handleBroadcast(@MessageBody() data: { name: string }) {
     return this.server.emit('greetings', {
       message: `Hello ${data.name}! Welcome to the world.`,
+    });
+  }
+
+  emitToUser(userId: string, event: string, payload: any) {
+    const sockets = this.userSockets.get(userId);
+    if (!sockets) return;
+
+    sockets.forEach((socketId) => {
+      this.server.to(socketId).emit(event, payload);
     });
   }
 }

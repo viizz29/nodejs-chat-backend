@@ -1,31 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { MessageRepository } from './messages.repository';
+import { ChatGateway } from 'src/chat/chat.gateway';
+import { RoomRepository } from 'src/rooms/rooms.repository';
 
 @Injectable()
 export class MessagesService {
-  constructor(private readonly messageRepository: MessageRepository) {}
-
-  async findAll() {
-    return this.messageRepository.findAll();
-  }
-
-  async findAllPaginated(page: number, limit: number) {
-    return this.messageRepository.findAllPaginated(page, limit);
-  }
-
-  async findAllPaginated2(
-    userId: number,
-    roomSn: number,
-    cursor: number | null,
-    limit: number,
-  ) {
-    return this.messageRepository.findAllPaginated2(
-      userId,
-      roomSn,
-      cursor,
-      limit,
-    );
-  }
+  constructor(
+    private readonly messageRepository: MessageRepository,
+    private readonly chatGateway: ChatGateway,
+    private readonly roomRepository: RoomRepository,
+  ) {}
 
   async findExchangedMessages(
     userId: number,
@@ -48,15 +32,34 @@ export class MessagesService {
     };
   }
 
-  async recordIndividualTextMessage(
-    userId: number,
-    secondPartyId: number,
-    text: string,
-  ) {
-    return this.messageRepository.recordIndividualTextMessage(
+  async recordTextMessage(userId: number, roomId: number, text: string) {
+    const content = {
+      type: 'text',
+      content: {
+        text,
+      },
+    };
+
+    const result = await this.messageRepository.recordTextMessage(
       userId,
-      secondPartyId,
-      text,
+      roomId,
+      content,
     );
+
+    // send notifications to all the concerned users
+    const roomRecord = await this.roomRepository.findOne(roomId);
+    if (roomRecord) {
+      const { firstMemberId, secondMemberId } = roomRecord;
+
+      const secondUserId =
+        firstMemberId == userId ? secondMemberId : firstMemberId;
+
+      this.chatGateway.emitToUser(`${secondUserId}`, 'new_message', {
+        roomId,
+        content,
+      });
+    }
+
+    return result;
   }
 }

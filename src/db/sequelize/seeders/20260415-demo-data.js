@@ -50,37 +50,30 @@ module.exports = {
         { from: 0, to: 1, content: { type: 'text', content: { text: 'Hi' } } },
         {
           from: 1,
-          to: 0,
           content: { type: 'text', content: { text: 'Hello' } },
         },
         {
           from: 0,
-          to: 1,
           content: { type: 'text', content: { text: 'How are you?' } },
         },
         {
           from: 1,
-          to: 0,
           content: { type: 'text', content: { text: 'I am fine.' } },
         },
         {
           from: 0,
-          to: 1,
           content: { type: 'text', content: { text: 'What about u?' } },
         },
         {
           from: 1,
-          to: 0,
           content: { type: 'text', content: { text: 'All good.' } },
         },
         {
           from: 0,
-          to: 1,
           content: { type: 'text', content: { text: 'I need a help?' } },
         },
         {
           from: 1,
-          to: 0,
           content: { type: 'text', content: { text: 'Regarding what?' } },
         },
       ];
@@ -89,13 +82,11 @@ module.exports = {
         if (k % 2 == 1) {
           messages.push({
             from: 0,
-            to: 1,
             content: { type: 'text', content: { text: `${k}` } },
           });
         } else {
           messages.push({
             from: 1,
-            to: 0,
             content: { type: 'text', content: { text: `${k}` } },
           });
         }
@@ -108,7 +99,6 @@ module.exports = {
         messageRecords.push({
           from_user_id: insertedUsers[from].id,
           room_id: theRoom.id,
-          to_user_id: insertedUsers[to].id,
           content: JSON.stringify(content),
           created_at: now,
           updated_at: now,

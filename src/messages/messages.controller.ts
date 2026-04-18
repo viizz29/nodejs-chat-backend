@@ -50,22 +50,16 @@ export class MessagesController {
 
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth('access-token')
-  @Post(':handleId')
+  @Post(':roomId')
   handleAction(
-    @Param('handleId') handleId: string,
+    @Param('roomId') roomId: number,
     @Body() body: { text: string },
     @CurrentUser() user: JwtUser,
   ) {
-    console.log({ handleId });
-
-    const hndleIdNum = Number(handleId);
-
     const { text } = body;
 
-    return {
-      handleId,
-      text,
-      status: 'success',
-    };
+    console.log({ roomId, userId: user.userId });
+
+    return this.messageService.recordTextMessage(user.userId, roomId, text);
   }
 }

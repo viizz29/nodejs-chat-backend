@@ -5,11 +5,15 @@ import { RoomRepository } from './rooms.repository';
 export class RoomsService {
   constructor(private readonly roomRepository: RoomRepository) {}
 
-  async findAll() {
-    return this.roomRepository.findAll();
+  async create(firstMemberId: number, secondMemberID: number) {
+    return this.roomRepository.create(firstMemberId, secondMemberID);
   }
 
-  async findByUserId(userId: number) {
-    return this.roomRepository.findByUserId(userId);
+  async findAllByUserId(userId: number) {
+    return this.roomRepository.findAllByUserId(userId);
+  }
+
+  async findOne(userId: number, roomId: number) {
+    return this.roomRepository.findOneByUserIdAndRoomId(userId, roomId);
   }
 }

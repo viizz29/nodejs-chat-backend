@@ -12,20 +12,38 @@ export class RoomRepository {
     private readonly sequelize: Sequelize,
   ) {}
 
-  async findAll(): Promise<Room[]> {
-    return this.roomModel.findAll({
-      attributes: [
-        'user_id',
-        'sn',
-        'type',
-        'title',
-        'created_at',
-        'updated_at',
-      ],
+  async findOne(roomId: number) {
+    return this.roomModel.findOne({ where: { id: roomId }, raw: true });
+  }
+
+  async findOneByUserIdAndRoomId(userId: number, roomId: number) {
+    return await this.sequelize.query(
+      `
+      select 
+      r.id,
+      CASE 
+          WHEN u1.id = :userId THEN u2.name
+          ELSE u1.name
+      END as Title
+      from 
+      rooms r
+      left join users u1 on u1.id = r.first_member_id
+      left join users u2 on u2.id = r.second_member_id
+      where r.id = :id`,
+      {
+        replacements: { id: roomId, userId },
+      },
+    );
+  }
+
+  async create(firstMemberId: number, secondMemberId: number): Promise<Room> {
+    return this.roomModel.create({
+      firstMemberId,
+      secondMemberId,
     });
   }
 
-  async findByUserId(userId: number): Promise<Room[]> {
+  async findAllByUserId(userId: number): Promise<Room[]> {
     const individuals = await this.sequelize.query(
       `SELECT
       json_build_array(r.id) as id,

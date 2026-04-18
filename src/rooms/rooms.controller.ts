@@ -1,8 +1,9 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { RoomsService } from './rooms.service';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { CurrentUser, type JwtUser } from 'src/common/current-user.decorator';
+import { CreateRoomDto } from './dto/create-room.dto';
 
 @Controller('v1/rooms')
 export class RoomsController {
@@ -22,10 +23,25 @@ export class RoomsController {
   // }
 
   //   @UseInterceptors(EncodeIdInterceptor)
+
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth('access-token')
   @Get()
   findAll(@CurrentUser() user: JwtUser) {
-    return this.roomsService.findByUserId(Number(user.userId));
+    return this.roomsService.findAllByUserId(Number(user.userId));
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth('access-token')
+  @Get(':roomId')
+  findOne(@Param('roomId') roomId: number, @CurrentUser() user: JwtUser) {
+    return this.roomsService.findOne(user.userId, roomId);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth('access-token')
+  @Post()
+  create(@Body() body: CreateRoomDto, @CurrentUser() user: JwtUser) {
+    return this.roomsService.create(user.userId, body.secondMemberId);
   }
 }

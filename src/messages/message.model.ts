@@ -11,9 +11,6 @@ export class Message extends Model {
   @Column
   fromUserId!: number;
 
-  @Column
-  toUserId!: number;
-
   @Column({
     type: DataType.JSON,
     allowNull: false,

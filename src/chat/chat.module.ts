@@ -12,5 +12,6 @@ import { JWT_SECRET } from 'src/config';
     }),
   ],
   providers: [ChatGateway],
+  exports: [ChatGateway],
 })
 export class ChatModule {}

@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { User } from './user.model';
 import { CreateUserDto } from './dto/create-user.dto';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class UserRepository {
@@ -23,6 +24,32 @@ export class UserRepository {
   async findAll(): Promise<User[]> {
     return this.userModel.findAll({
       attributes: ['id', 'name', 'email'], // ONLY these will be returned
+    });
+  }
+
+  async findAllByNameOrEmail(search: string): Promise<User[]> {
+    if (!search) {
+      return this.userModel.findAll({
+        attributes: ['id', 'name', 'email'],
+      });
+    }
+
+    return this.userModel.findAll({
+      attributes: ['id', 'name', 'email'],
+      where: {
+        [Op.or]: [
+          {
+            name: {
+              [Op.iLike]: `%${search}%`, // case-insensitive (Postgres)
+            },
+          },
+          {
+            email: {
+              [Op.iLike]: `%${search}%`,
+            },
+          },
+        ],
+      },
     });
   }
 
