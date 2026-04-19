@@ -48,9 +48,15 @@ export class RoomRepository {
       `SELECT
       json_build_array(r.id) as id,
       type,
-      'No title' as title
+      CASE 
+          WHEN u1.id = :userId THEN u2.name
+          ELSE u1.name
+      END as title
       from rooms r
-      where (r.first_member_id = :userId or r.second_member_id = :userId) and r.type = :type
+      left join users u1 on u1.id = r.first_member_id
+      left join users u2 on u2.id = r.second_member_id
+      where 
+      (r.first_member_id = :userId or r.second_member_id = :userId) and r.type = :type
       `,
       {
         replacements: {

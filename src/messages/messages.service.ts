@@ -28,7 +28,7 @@ export class MessagesService {
 
     return {
       data: messages,
-      prev_cursor_id: messages.length > 0 ? messages[0].id : [0],
+      prev_cursor_id: messages.length > 0 ? messages[0].id : null,
     };
   }
 
