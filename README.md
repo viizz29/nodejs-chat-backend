@@ -53,7 +53,7 @@ src/
 ## Installation
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/viizz29/nodejs-chat-backend
 cd chat-backend
 npm install
 ```
